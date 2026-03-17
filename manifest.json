@@ -4,8 +4,8 @@
   "description": "极简时间管理，每天只做最重要的三件事",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0f1a2e",
-  "theme_color": "#1a2744",
+  "background_color": "#F9F5EE",
+  "theme_color": "#F9F5EE",
   "orientation": "portrait",
   "icons": [
     {
