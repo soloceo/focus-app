@@ -279,7 +279,7 @@
       if (todayActiveTasks.length < 3) {
         const promoteBtn = document.createElement('button');
         promoteBtn.className = 'status-btn promote-btn';
-        promoteBtn.textContent = '今日重点';
+        promoteBtn.textContent = '加入今天';
         promoteBtn.onclick = e => {
           e.stopPropagation();
           promoteToToday(task.id);
@@ -291,7 +291,7 @@
     if (isToday && !task.done) {
       const demoteBtn = document.createElement('button');
       demoteBtn.className = 'status-btn demote-btn';
-      demoteBtn.textContent = '移出';
+      demoteBtn.textContent = '移回待办';
       demoteBtn.onclick = e => {
         e.stopPropagation();
         demoteToPool(task.id);
@@ -655,59 +655,48 @@
     });
   }
 
-  // --- Onboarding ---
+  // --- Help ---
+  const helpOverlay = document.getElementById('help-overlay');
+  const helpBtn = document.getElementById('help-btn');
+  const helpCloseBtn = document.getElementById('help-close');
+
+  helpBtn.addEventListener('click', () => {
+    helpOverlay.classList.remove('hidden');
+  });
+
+  helpCloseBtn.addEventListener('click', () => {
+    helpOverlay.classList.add('hidden');
+  });
+
+  helpOverlay.addEventListener('click', e => {
+    if (e.target === helpOverlay) {
+      helpOverlay.classList.add('hidden');
+    }
+  });
+
+  // --- First-time template tasks ---
   const ONBOARDING_KEY = 'cike_onboarded';
-  const onboardingOverlay = document.getElementById('onboarding-overlay');
-  const onboardingNextBtn = document.getElementById('onboarding-next');
-  let onboardingPage = 0;
-  const totalPages = 4;
-
-  function showOnboarding() {
-    if (localStorage.getItem(ONBOARDING_KEY)) return;
-    onboardingOverlay.classList.remove('hidden');
-  }
-
-  function updateOnboardingPage() {
-    onboardingOverlay.querySelectorAll('.onboarding-page').forEach(p => {
-      p.classList.toggle('active', parseInt(p.dataset.page) === onboardingPage);
-    });
-    onboardingOverlay.querySelectorAll('.onboarding-dots .dot').forEach((d, i) => {
-      d.classList.toggle('active', i === onboardingPage);
-    });
-    onboardingNextBtn.textContent = onboardingPage === totalPages - 1 ? '开始使用' : '下一步';
-  }
 
   function addTemplateTasks() {
+    if (localStorage.getItem(ONBOARDING_KEY)) return;
+    localStorage.setItem(ONBOARDING_KEY, '1');
     const key = todayKey();
     const makeId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     data.todayDate = key;
     data.tasks = [
       { id: makeId(), text: '试试点击我，看看会发生什么', isToday: true, done: false, started: false, firstStep: null, created: new Date().toISOString(), doneDate: null },
-      { id: makeId(), text: '长按或双击任务可以编辑文字', isToday: false, done: false, started: false, firstStep: null, created: new Date().toISOString(), doneDate: null },
+      { id: makeId(), text: '双击任务文字可以编辑内容', isToday: false, done: false, started: false, firstStep: null, created: new Date().toISOString(), doneDate: null },
       { id: makeId(), text: '写下你今天真正想做的一件事', isToday: false, done: false, started: false, firstStep: null, created: new Date().toISOString(), doneDate: null },
     ];
     save(data);
     render();
   }
 
-  onboardingNextBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    onboardingPage++;
-    if (onboardingPage >= totalPages) {
-      onboardingOverlay.classList.add('hidden');
-      localStorage.setItem(ONBOARDING_KEY, '1');
-      addTemplateTasks();
-      inputEl.focus();
-    } else {
-      updateOnboardingPage();
-    }
-  });
-
   // --- Init ---
   checkNewDay();
   render();
   scheduleNotifications();
-  showOnboarding();
+  addTemplateTasks();
 
   function scheduleMidnightRefresh() {
     const now = new Date();
