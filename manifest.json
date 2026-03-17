@@ -1,7 +1,7 @@
 {
-  "name": "专注 - 时间管理",
-  "short_name": "专注",
-  "description": "极简时间管理，每天只做最重要的三件事",
+  "name": "此刻 - 从这一小步开始",
+  "short_name": "此刻",
+  "description": "不用想太远，此刻只做眼前最重要的一小步",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#F9F5EE",

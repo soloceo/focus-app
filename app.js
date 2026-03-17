@@ -645,10 +645,10 @@
     const activeTodayCount = data.tasks.filter(t => t.isToday && !t.done).length;
 
     if (activeTodayCount === 0) {
-      scheduleAt(today9am, '专注 · 早安', '新的一天，选择今天最重要的 3 件事吧');
+      scheduleAt(today9am, '此刻 · 早安', '新的一天，选择今天最重要的 3 件事吧');
     }
 
-    scheduleAt(today3pm, '专注 · 下午好', '检查一下今日重点的进度吧');
+    scheduleAt(today3pm, '此刻 · 下午好', '检查一下今日重点的进度吧');
   }
 
   // --- Service Worker ---
@@ -658,10 +658,44 @@
     });
   }
 
+  // --- Onboarding ---
+  const ONBOARDING_KEY = 'cike_onboarded';
+  const onboardingOverlay = document.getElementById('onboarding-overlay');
+  const onboardingNextBtn = document.getElementById('onboarding-next');
+  let onboardingPage = 0;
+  const totalPages = 4;
+
+  function showOnboarding() {
+    if (localStorage.getItem(ONBOARDING_KEY)) return;
+    onboardingOverlay.classList.remove('hidden');
+  }
+
+  function updateOnboardingPage() {
+    onboardingOverlay.querySelectorAll('.onboarding-page').forEach(p => {
+      p.classList.toggle('active', parseInt(p.dataset.page) === onboardingPage);
+    });
+    onboardingOverlay.querySelectorAll('.onboarding-dots .dot').forEach((d, i) => {
+      d.classList.toggle('active', i === onboardingPage);
+    });
+    onboardingNextBtn.textContent = onboardingPage === totalPages - 1 ? '开始使用' : '下一步';
+  }
+
+  onboardingNextBtn.addEventListener('click', () => {
+    onboardingPage++;
+    if (onboardingPage >= totalPages) {
+      onboardingOverlay.classList.add('hidden');
+      localStorage.setItem(ONBOARDING_KEY, '1');
+      inputEl.focus();
+    } else {
+      updateOnboardingPage();
+    }
+  });
+
   // --- Init ---
   checkNewDay();
   render();
   scheduleNotifications();
+  showOnboarding();
 
   function scheduleMidnightRefresh() {
     const now = new Date();

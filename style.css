@@ -671,6 +671,93 @@ li:hover .task-actions {
   margin-bottom: 20px;
 }
 
+/* --- Onboarding --- */
+.onboarding-card {
+  background: var(--surface);
+  border-radius: 24px;
+  padding: 36px 28px 28px;
+  max-width: 340px;
+  width: 100%;
+  box-shadow: var(--shadow-md);
+  animation: cardIn 0.35s ease;
+  text-align: center;
+  overflow: hidden;
+}
+
+.onboarding-pages {
+  position: relative;
+  min-height: 220px;
+}
+
+.onboarding-page {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  animation: onboardingFadeIn 0.4s ease;
+}
+
+.onboarding-page.active {
+  display: flex;
+}
+
+@keyframes onboardingFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.onboarding-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.onboarding-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 14px;
+  line-height: 1.4;
+}
+
+.onboarding-text {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  font-weight: 400;
+}
+
+.onboarding-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 24px 0 20px;
+}
+
+.onboarding-dots .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all 0.3s;
+}
+
+.onboarding-dots .dot.active {
+  background: var(--primary);
+  width: 20px;
+  border-radius: 4px;
+}
+
+.onboarding-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+}
+
 /* --- Toast --- */
 .toast {
   position: fixed;
