@@ -18,7 +18,10 @@
     <header>
       <div class="header-left">
         <h1 id="greeting"></h1>
-        <p id="breathing-text" class="breathing-text"></p>
+        <div class="breathing-row">
+          <div class="breathing-circle"></div>
+          <p id="breathing-text" class="breathing-text"></p>
+        </div>
       </div>
       <div class="header-right">
         <button id="help-btn" class="help-btn" title="使用说明" aria-label="使用说明">?</button>
@@ -174,6 +177,30 @@
           </div>
 
           <div class="help-section">
+            <h3>背后的道理</h3>
+            <div class="help-item">
+              <span class="help-label">为什么只有 3 件</span>
+              <span class="help-desc">选择越多越焦虑。只挑 3 件，让大脑觉得「我能做到」</span>
+            </div>
+            <div class="help-item">
+              <span class="help-label">5 分钟法则</span>
+              <span class="help-desc">大脑一旦开始就想完成。难的从来不是做完，而是开始</span>
+            </div>
+            <div class="help-item">
+              <span class="help-label">完成 ≠ 完美</span>
+              <span class="help-desc">做了 60 分的事，比想了 100 分却没动手强太多了</span>
+            </div>
+            <div class="help-item">
+              <span class="help-label">跳过也没关系</span>
+              <span class="help-desc">跳过不是放弃，是在找此刻最想做的那一件</span>
+            </div>
+            <div class="help-item">
+              <span class="help-label">为什么问你感觉</span>
+              <span class="help-desc">承认「还没准备好」本身就是进步。不强迫，反而更容易开始</span>
+            </div>
+          </div>
+
+          <div class="help-section">
             <h3>小贴士</h3>
             <div class="help-item">
               <span class="help-label">双击文字</span>
@@ -193,6 +220,16 @@
             <p>完成一件小事，比计划十件大事更有力量。</p>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Weekly review overlay -->
+    <div id="review-overlay" class="overlay hidden">
+      <div class="review-card">
+        <div class="review-icon">🌿</div>
+        <p class="review-title" id="review-title"></p>
+        <p class="review-detail" id="review-detail"></p>
+        <button id="review-close" class="firststep-btn primary">继续加油</button>
       </div>
     </div>
 

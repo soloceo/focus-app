@@ -3,6 +3,8 @@
 
   const STORAGE_KEY = 'focus_tasks';
   const ONBOARDING_KEY = 'cike_onboarded';
+  const REVIEW_KEY = 'cike_last_review';
+  const COMPLETED_LOG_KEY = 'cike_completed_log';
   const RING_CIRCUMFERENCE = 2 * Math.PI * 16;
 
   const ENCOURAGEMENTS = [
@@ -63,6 +65,7 @@
   let focusIndex = 0; // which today task to show in focus mode
   let showingListView = false;
   let skipCount = 0;
+  let touchDragId = null;
 
   function checkNewDay() {
     const key = todayKey();
@@ -111,6 +114,11 @@
   const listView = document.getElementById('list-view');
   const viewToggle = document.getElementById('view-toggle');
   const toggleBtn = document.getElementById('toggle-view');
+
+  // Review refs
+  const reviewOverlay = document.getElementById('review-overlay');
+  const reviewTitle = document.getElementById('review-title');
+  const reviewDetail = document.getElementById('review-detail');
 
   // Modal refs
   const moodOverlay = document.getElementById('mood-overlay');
@@ -530,7 +538,7 @@
       });
     }
 
-    // Drag & Drop
+    // Drag & Drop (desktop)
     li.addEventListener('dragstart', e => {
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', task.id);
@@ -551,6 +559,41 @@
       li.classList.remove('drag-over');
       const draggedId = e.dataTransfer.getData('text/plain');
       if (draggedId !== task.id) reorderTask(draggedId, task.id);
+    });
+
+    // Touch drag (mobile)
+    let touchTimeout = null;
+    li.addEventListener('touchstart', e => {
+      touchTimeout = setTimeout(() => {
+        touchTimeout = null;
+        li.classList.add('dragging');
+        li.dataset.touching = '1';
+        touchDragId = task.id;
+      }, 400);
+    }, { passive: true });
+    li.addEventListener('touchmove', e => {
+      if (touchTimeout) { clearTimeout(touchTimeout); touchTimeout = null; }
+      if (!li.dataset.touching) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      const target = document.elementFromPoint(touch.clientX, touch.clientY);
+      const targetLi = target && target.closest('li[data-id]');
+      document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+      if (targetLi && targetLi.dataset.id !== task.id) {
+        targetLi.classList.add('drag-over');
+      }
+    });
+    li.addEventListener('touchend', e => {
+      if (touchTimeout) { clearTimeout(touchTimeout); touchTimeout = null; }
+      if (!li.dataset.touching) return;
+      delete li.dataset.touching;
+      li.classList.remove('dragging');
+      const overEl = document.querySelector('.drag-over');
+      if (overEl && touchDragId) {
+        reorderTask(touchDragId, overEl.dataset.id);
+      }
+      document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+      touchDragId = null;
     });
 
     return li;
@@ -741,7 +784,10 @@
     completeCooldown = true;
     task.done = !task.done;
     task.doneDate = task.done ? todayKey() : null;
-    if (task.done) task.started = true;
+    if (task.done) {
+      task.started = true;
+      logCompletion();
+    }
     save(data);
     render();
     setTimeout(() => { completeCooldown = false; }, 500);
@@ -814,7 +860,74 @@
     inputEl.focus();
   });
 
-  // --- Notifications ---
+  // --- Completion log (for weekly review) ---
+  function logCompletion() {
+    try {
+      const log = JSON.parse(localStorage.getItem(COMPLETED_LOG_KEY) || '{}');
+      const key = todayKey();
+      log[key] = (log[key] || 0) + 1;
+      // Keep only last 30 days
+      const keys = Object.keys(log).sort();
+      if (keys.length > 30) {
+        keys.slice(0, keys.length - 30).forEach(k => delete log[k]);
+      }
+      localStorage.setItem(COMPLETED_LOG_KEY, JSON.stringify(log));
+    } catch {}
+  }
+
+  // --- Weekly review ---
+  function checkWeeklyReview() {
+    const now = new Date();
+    if (now.getDay() !== 0) return; // Only on Sunday
+    const lastReview = localStorage.getItem(REVIEW_KEY);
+    const thisWeekKey = todayKey();
+    if (lastReview === thisWeekKey) return; // Already shown today
+
+    try {
+      const log = JSON.parse(localStorage.getItem(COMPLETED_LOG_KEY) || '{}');
+      const weekAgo = new Date(now);
+      weekAgo.setDate(weekAgo.getDate() - 7);
+
+      let weekTotal = 0;
+      let activeDays = 0;
+      for (let d = new Date(weekAgo); d <= now; d.setDate(d.getDate() + 1)) {
+        const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        if (log[k]) {
+          weekTotal += log[k];
+          activeDays++;
+        }
+      }
+
+      if (weekTotal === 0) return; // Nothing to show
+
+      localStorage.setItem(REVIEW_KEY, thisWeekKey);
+      reviewTitle.textContent = `这周你完成了 ${weekTotal} 件事`;
+      if (activeDays >= 5) {
+        reviewDetail.textContent = `${activeDays} 天都在行动，你比想象的更有力量`;
+      } else if (weekTotal >= 10) {
+        reviewDetail.textContent = '积少成多，每一件都算数';
+      } else {
+        reviewDetail.textContent = '每完成一件小事，都是对自己的证明';
+      }
+      reviewOverlay.classList.remove('hidden');
+    } catch {}
+  }
+
+  document.getElementById('review-close').addEventListener('click', () => {
+    reviewOverlay.classList.add('hidden');
+  });
+  reviewOverlay.addEventListener('click', e => {
+    if (e.target === reviewOverlay) reviewOverlay.classList.add('hidden');
+  });
+
+  // --- Notifications (gentle reminder) ---
+  const NOTIFICATION_TEXTS = [
+    '今天想做点什么吗？',
+    '有什么小事可以先开始？',
+    '一件小事就够了',
+    '不急，打开看看就好',
+  ];
+
   function requestNotificationPermission() {
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission();
@@ -824,8 +937,7 @@
   function scheduleNotifications() {
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
     const now = new Date();
-    const today9am = new Date(now); today9am.setHours(9, 0, 0, 0);
-    const today3pm = new Date(now); today3pm.setHours(15, 0, 0, 0);
+    const today10am = new Date(now); today10am.setHours(10, 0, 0, 0);
 
     function scheduleAt(target, title, body) {
       let delay = target.getTime() - now.getTime();
@@ -841,9 +953,9 @@
 
     const activeTodayCount = data.tasks.filter(t => t.isToday && !t.done).length;
     if (activeTodayCount === 0) {
-      scheduleAt(today9am, '此刻 · 早安', '新的一天，选一件小事开始吧');
+      const text = NOTIFICATION_TEXTS[Math.floor(Math.random() * NOTIFICATION_TEXTS.length)];
+      scheduleAt(today10am, '此刻', text);
     }
-    scheduleAt(today3pm, '此刻 · 下午好', '看看今天的进度吧');
   }
 
   // --- Service Worker ---
@@ -885,6 +997,7 @@
   render();
   scheduleNotifications();
   addTemplateTasks();
+  checkWeeklyReview();
 
   function scheduleMidnightRefresh() {
     const now = new Date();
