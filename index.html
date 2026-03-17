@@ -51,6 +51,12 @@
       <p class="done-sub">你做得很好。</p>
     </div>
 
+    <!-- Pool hint: no today tasks but pool has items -->
+    <div id="pool-hint" class="pool-hint hidden">
+      <p class="pool-hint-text" id="pool-hint-text"></p>
+      <button id="pool-hint-btn" class="focus-btn secondary">去看看</button>
+    </div>
+
     <!-- List view (toggled) -->
     <div id="list-view" class="hidden">
       <section id="today-section" class="hidden">
@@ -131,68 +137,60 @@
         </div>
         <div class="help-body">
           <div class="help-intro">
-            <p>此刻是一个帮助你<strong>克服拖延</strong>的小工具。</p>
-            <p>不用想太远的事，只关注眼前最重要的一小步。</p>
+            <p>拖延不是懒，是因为任务看起来太大、太远、太难开始。</p>
+            <p><strong>此刻</strong>帮你把注意力收回眼前，只看一小步。</p>
           </div>
 
           <div class="help-section">
-            <h3>基本用法</h3>
+            <h3>怎么用</h3>
             <div class="help-item">
-              <span class="help-label">添加任务</span>
-              <span class="help-desc">在底部输入框写下想做的事，点 + 或按回车添加</span>
+              <span class="help-label">写下来</span>
+              <span class="help-desc">底部输入框，把脑子里的事写出来。写下来本身就是进步</span>
             </div>
             <div class="help-item">
-              <span class="help-label">聚焦模式</span>
-              <span class="help-desc">默认一次只显示一件事，减少焦虑。点底部按钮可切换列表视图</span>
+              <span class="help-label">选三件</span>
+              <span class="help-desc">每天最多选 3 件事「加入今天」。少即是多，不贪心</span>
             </div>
             <div class="help-item">
-              <span class="help-label">双击任务文字</span>
-              <span class="help-desc">可以修改任务内容</span>
+              <span class="help-label">看一件</span>
+              <span class="help-desc">聚焦模式一次只看一件事，不被其他任务干扰</span>
             </div>
           </div>
 
           <div class="help-section">
-            <h3>按钮说明</h3>
+            <h3>遇到困难时</h3>
             <div class="help-item">
-              <span class="help-badge promote-btn">加入今天</span>
-              <span class="help-desc">把待办池的任务设为今天要做的（最多 3 件）</span>
+              <span class="help-badge break-btn">拆一步</span>
+              <span class="help-desc">任务太大不想动？拆成 5 分钟能做完的一小步，小到不好意思不做</span>
             </div>
             <div class="help-item">
               <span class="help-badge start-btn">开始</span>
-              <span class="help-desc">告诉自己「我开始做了」，这就是最大的进步</span>
+              <span class="help-desc">不用做完，先「开始」就好。开始是最难也最重要的一步</span>
             </div>
             <div class="help-item">
-              <span class="help-badge complete-btn">完成</span>
-              <span class="help-desc">做完了，标记为已完成</span>
-            </div>
-            <div class="help-item">
-              <span class="help-badge break-btn">拆一步</span>
-              <span class="help-desc">任务太大不想做？拆成 5 分钟能完成的一小步</span>
-            </div>
-            <div class="help-item">
-              <span class="help-badge demote-btn">移回待办</span>
-              <span class="help-desc">今天做不了，先放回待办池，改天再做</span>
-            </div>
-            <div class="help-item">
-              <span class="help-badge delete-btn">删除</span>
-              <span class="help-desc">不需要了，彻底删掉</span>
+              <span class="help-label">情绪缓冲</span>
+              <span class="help-desc">在列表视图点击任务时，会先问你感觉怎么样。没准备好也没关系，不急</span>
             </div>
           </div>
 
           <div class="help-section">
-            <h3>特别功能</h3>
+            <h3>小贴士</h3>
             <div class="help-item">
-              <span class="help-label">情绪缓冲</span>
-              <span class="help-desc">在列表视图点击今天的任务时，会先问你感觉怎么样。没准备好也没关系</span>
+              <span class="help-label">双击文字</span>
+              <span class="help-desc">可以修改任务内容</span>
             </div>
             <div class="help-item">
               <span class="help-label">进度圆环</span>
-              <span class="help-desc">右上角显示今天的完成进度，全部做完会有小惊喜</span>
+              <span class="help-desc">右上角显示今天的进度，全部完成有小惊喜</span>
+            </div>
+            <div class="help-item">
+              <span class="help-label">查看全部</span>
+              <span class="help-desc">点底部按钮切换聚焦模式和列表视图</span>
             </div>
           </div>
 
           <div class="help-footer">
-            <p>慢慢来，不急。从此刻开始。</p>
+            <p>完成一件小事，比计划十件大事更有力量。</p>
           </div>
         </div>
       </div>
