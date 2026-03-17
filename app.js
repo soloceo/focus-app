@@ -62,6 +62,7 @@
   let moodTargetTaskId = null;
   let focusIndex = 0; // which today task to show in focus mode
   let showingListView = false;
+  let skipCount = 0;
 
   function checkNewDay() {
     const key = todayKey();
@@ -104,6 +105,9 @@
   const focusSkipBtn = document.getElementById('focus-skip');
   const doneState = document.getElementById('done-state');
   const doneText = document.getElementById('done-text');
+  const poolHint = document.getElementById('pool-hint');
+  const poolHintText = document.getElementById('pool-hint-text');
+  const poolHintBtn = document.getElementById('pool-hint-btn');
   const listView = document.getElementById('list-view');
   const viewToggle = document.getElementById('view-toggle');
   const toggleBtn = document.getElementById('toggle-view');
@@ -118,16 +122,34 @@
 
   // --- Toast ---
   let toastTimer = null;
-  function showToast(msg) {
+  let undoTimer = null;
+  function showToast(msg, undoCallback) {
     clearTimeout(toastTimer);
-    toastEl.textContent = msg;
+    clearTimeout(undoTimer);
+    toastEl.innerHTML = '';
+    const textNode = document.createTextNode(msg);
+    toastEl.appendChild(textNode);
+    if (undoCallback) {
+      const undoBtn = document.createElement('button');
+      undoBtn.className = 'toast-undo';
+      undoBtn.textContent = '撤销';
+      undoBtn.onclick = e => {
+        e.stopPropagation();
+        clearTimeout(toastTimer);
+        clearTimeout(undoTimer);
+        toastEl.classList.add('hidden');
+        undoCallback();
+      };
+      toastEl.appendChild(undoBtn);
+    }
     toastEl.classList.remove('hidden');
     toastEl.style.animation = 'none';
     toastEl.offsetHeight;
     toastEl.style.animation = '';
+    const duration = undoCallback ? 4500 : 3500;
     toastTimer = setTimeout(() => {
       toastEl.classList.add('hidden');
-    }, 2500);
+    }, duration);
   }
 
   // --- Progress Ring ---
@@ -209,19 +231,20 @@
     greetingEl.textContent = getGreeting();
     breathingEl.textContent = getBreathingText();
 
-    const todayTasks = data.tasks.filter(t => t.isToday);
-    const poolTasks = data.tasks.filter(t => !t.isToday);
+    const visibleTasks = data.tasks.filter(t => !t._pendingDelete);
+    const todayTasks = visibleTasks.filter(t => t.isToday);
+    const poolTasks = visibleTasks.filter(t => !t.isToday);
     const activeTodayTasks = todayTasks.filter(t => !t.done);
     const doneTodayTasks = todayTasks.filter(t => t.done);
-    const hasTasks = data.tasks.length > 0;
+    const hasTasks = visibleTasks.length > 0;
 
     // Show/hide empty state
     emptyState.classList.toggle('hidden', hasTasks);
 
-    // Render focus card or done state
+    // Render focus card, done state, or pool hint
+    poolHint.classList.add('hidden');
     if (todayTasks.length > 0) {
       if (activeTodayTasks.length === 0) {
-        // All today tasks done
         focusCard.classList.add('hidden');
         doneState.classList.remove('hidden');
         doneText.textContent = `今天完成了 ${doneTodayTasks.length} 件事`;
@@ -236,6 +259,10 @@
     } else {
       focusCard.classList.add('hidden');
       doneState.classList.add('hidden');
+      if (poolTasks.length > 0 && !showingListView) {
+        poolHint.classList.remove('hidden');
+        poolHintText.textContent = `待办池里有 ${poolTasks.length} 件事，选一件加入今天？`;
+      }
     }
 
     // View toggle
@@ -277,6 +304,16 @@
 
     focusCard.classList.remove('hidden');
     focusCard.dataset.taskId = task.id;
+
+    // Dynamic label based on task state
+    const focusLabel = focusCard.querySelector('.focus-label');
+    if (task.started) {
+      focusLabel.textContent = '你已经在做了，继续吧';
+    } else if (task.firstStep) {
+      focusLabel.textContent = '从这一小步开始';
+    } else {
+      focusLabel.textContent = '此刻，只看这一件';
+    }
 
     // Show first step if available, otherwise full task
     if (task.firstStep) {
@@ -322,7 +359,22 @@
   });
 
   focusSkipBtn.addEventListener('click', () => {
+    skipCount++;
+    const activeTasks = data.tasks.filter(t => t.isToday && !t.done && !t._pendingDelete);
     focusIndex++;
+    if (focusIndex >= activeTasks.length) {
+      focusIndex = 0;
+      showToast('都看了一遍了，选一件最小的开始试试？');
+      skipCount = 0;
+    } else if (skipCount === 2) {
+      showToast('跳过也没关系，找到想做的那件');
+    }
+    render();
+  });
+
+  // Pool hint button
+  poolHintBtn.addEventListener('click', () => {
+    showingListView = true;
     render();
   });
 
@@ -330,6 +382,11 @@
   toggleBtn.addEventListener('click', () => {
     showingListView = !showingListView;
     render();
+    const entering = showingListView ? listView : focusCard;
+    if (entering && !entering.classList.contains('hidden')) {
+      entering.classList.add('view-entering');
+      setTimeout(() => entering.classList.remove('view-entering'), 350);
+    }
   });
 
   // --- Create task element (list view) ---
@@ -429,22 +486,25 @@
       delBtn.textContent = '删除';
       delBtn.onclick = e => {
         e.stopPropagation();
-        li.classList.add('removing');
-        li.addEventListener('transitionend', () => deleteTask(task.id), { once: true });
-        setTimeout(() => deleteTask(task.id), 350);
+        deleteTask(task.id);
       };
       moreActions.appendChild(delBtn);
 
       // moreActions appended to li below, not to actions
       li._moreActions = moreActions;
     } else if (!isToday && !task.done) {
-      const todayActiveTasks = data.tasks.filter(t => t.isToday && !t.done);
+      const todayActiveTasks = data.tasks.filter(t => t.isToday && !t.done && !t._pendingDelete);
       if (todayActiveTasks.length < 3) {
         const promoteBtn = document.createElement('button');
         promoteBtn.className = 'status-btn promote-btn';
         promoteBtn.textContent = '加入今天';
         promoteBtn.onclick = e => { e.stopPropagation(); promoteToToday(task.id); };
         actions.appendChild(promoteBtn);
+      } else {
+        const limitHint = document.createElement('span');
+        limitHint.className = 'limit-hint';
+        limitHint.textContent = '今天已有 3 件';
+        actions.appendChild(limitHint);
       }
 
       const delBtn = document.createElement('button');
@@ -452,9 +512,7 @@
       delBtn.textContent = '删除';
       delBtn.onclick = e => {
         e.stopPropagation();
-        li.classList.add('removing');
-        li.addEventListener('transitionend', () => deleteTask(task.id), { once: true });
-        setTimeout(() => deleteTask(task.id), 350);
+        deleteTask(task.id);
       };
       actions.appendChild(delBtn);
     }
@@ -645,10 +703,12 @@
   function addTask(text) {
     const trimmed = text.trim();
     if (!trimmed) return;
+    const todayCount = data.tasks.filter(t => t.isToday && !t.done && !t._pendingDelete).length;
+    const autoToday = todayCount < 3;
     data.tasks.push({
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       text: trimmed,
-      isToday: false,
+      isToday: autoToday,
       done: false,
       started: false,
       firstStep: null,
@@ -657,6 +717,11 @@
     });
     save(data);
     render();
+    if (autoToday) {
+      showToast(`已加入今天 (${todayCount + 1}/3)`);
+    } else {
+      showToast('先放在待办池，完成今天的再来');
+    }
   }
 
   function startTask(id) {
@@ -668,14 +733,18 @@
     showToast('很好，你开始了！');
   }
 
+  let completeCooldown = false;
   function completeTask(id) {
+    if (completeCooldown) return;
     const task = data.tasks.find(t => t.id === id);
     if (!task) return;
+    completeCooldown = true;
     task.done = !task.done;
     task.doneDate = task.done ? todayKey() : null;
     if (task.done) task.started = true;
     save(data);
     render();
+    setTimeout(() => { completeCooldown = false; }, 500);
   }
 
   function setFirstStep(id, step) {
@@ -695,6 +764,7 @@
     task.isToday = true;
     save(data);
     render();
+    showToast(`已加入今天 (${activeTodayCount + 1}/3)`);
   }
 
   function demoteToPool(id) {
@@ -703,16 +773,30 @@
     task.isToday = false;
     save(data);
     render();
+    showToast('已移回待办池');
   }
 
   let deletePending = false;
+  let deleteUndoTimer = null;
   function deleteTask(id) {
     if (deletePending) return;
     deletePending = true;
-    data.tasks = data.tasks.filter(t => t.id !== id);
+    const task = data.tasks.find(t => t.id === id);
+    if (!task) { deletePending = false; return; }
+    task._pendingDelete = true;
     save(data);
     render();
     deletePending = false;
+    clearTimeout(deleteUndoTimer);
+    showToast('已删除', () => {
+      task._pendingDelete = false;
+      save(data);
+      render();
+    });
+    deleteUndoTimer = setTimeout(() => {
+      data.tasks = data.tasks.filter(t => !t._pendingDelete);
+      save(data);
+    }, 4500);
   }
 
   // --- Input ---

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cike-v7';
+const CACHE_NAME = 'cike-v8';
 const ASSETS = [
   './',
   './index.html',
