@@ -435,7 +435,8 @@
       };
       moreActions.appendChild(delBtn);
 
-      actions.appendChild(moreActions);
+      // moreActions appended to li below, not to actions
+      li._moreActions = moreActions;
     } else if (!isToday && !task.done) {
       const todayActiveTasks = data.tasks.filter(t => t.isToday && !t.done);
       if (todayActiveTasks.length < 3) {
@@ -461,6 +462,7 @@
     li.appendChild(checkBtn);
     li.appendChild(span);
     li.appendChild(actions);
+    if (li._moreActions) li.appendChild(li._moreActions);
 
     // Mood check on click (list view, not started tasks)
     if (isToday && !task.done && !task.started) {

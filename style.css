@@ -651,18 +651,21 @@ li:hover .task-actions {
 
 .more-actions {
   display: none;
-  gap: 4px;
-  margin-top: 6px;
+  gap: 6px;
+  padding: 10px 16px 4px;
+  flex-wrap: wrap;
+  width: 100%;
+  justify-content: flex-end;
+  border-top: 1px solid var(--border);
+  margin-top: 10px;
+}
+
+li.show-more {
   flex-wrap: wrap;
 }
 
 li.show-more .more-actions {
   display: flex;
-}
-
-/* When show-more is active, make actions wrap */
-li.show-more .task-actions {
-  flex-wrap: wrap;
 }
 
 /* --- Empty state --- */
