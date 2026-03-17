@@ -278,9 +278,8 @@
       const todayActiveTasks = data.tasks.filter(t => t.isToday && !t.done);
       if (todayActiveTasks.length < 3) {
         const promoteBtn = document.createElement('button');
-        promoteBtn.className = 'action-btn promote';
-        promoteBtn.textContent = '\u2191';
-        promoteBtn.title = '设为今日重点';
+        promoteBtn.className = 'status-btn promote-btn';
+        promoteBtn.textContent = '今日重点';
         promoteBtn.onclick = e => {
           e.stopPropagation();
           promoteToToday(task.id);
@@ -291,9 +290,8 @@
 
     if (isToday && !task.done) {
       const demoteBtn = document.createElement('button');
-      demoteBtn.className = 'action-btn';
-      demoteBtn.textContent = '\u2193';
-      demoteBtn.title = '移到待办池';
+      demoteBtn.className = 'status-btn demote-btn';
+      demoteBtn.textContent = '移出';
       demoteBtn.onclick = e => {
         e.stopPropagation();
         demoteToPool(task.id);
@@ -302,9 +300,8 @@
     }
 
     const delBtn = document.createElement('button');
-    delBtn.className = 'action-btn delete';
-    delBtn.textContent = '\u00d7';
-    delBtn.title = '删除';
+    delBtn.className = 'status-btn delete-btn';
+    delBtn.textContent = '删除';
     delBtn.onclick = e => {
       e.stopPropagation();
       li.classList.add('removing');
@@ -680,11 +677,26 @@
     onboardingNextBtn.textContent = onboardingPage === totalPages - 1 ? '开始使用' : '下一步';
   }
 
-  onboardingNextBtn.addEventListener('click', () => {
+  function addTemplateTasks() {
+    const key = todayKey();
+    const makeId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    data.todayDate = key;
+    data.tasks = [
+      { id: makeId(), text: '试试点击我，看看会发生什么', isToday: true, done: false, started: false, firstStep: null, created: new Date().toISOString(), doneDate: null },
+      { id: makeId(), text: '长按或双击任务可以编辑文字', isToday: false, done: false, started: false, firstStep: null, created: new Date().toISOString(), doneDate: null },
+      { id: makeId(), text: '写下你今天真正想做的一件事', isToday: false, done: false, started: false, firstStep: null, created: new Date().toISOString(), doneDate: null },
+    ];
+    save(data);
+    render();
+  }
+
+  onboardingNextBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
     onboardingPage++;
     if (onboardingPage >= totalPages) {
       onboardingOverlay.classList.add('hidden');
       localStorage.setItem(ONBOARDING_KEY, '1');
+      addTemplateTasks();
       inputEl.focus();
     } else {
       updateOnboardingPage();
