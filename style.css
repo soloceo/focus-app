@@ -47,29 +47,198 @@ html, body {
 /* --- Header --- */
 header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  padding: 28px 0 24px;
+  padding: 28px 0 20px;
 }
 
 .header-left {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 header h1 {
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  font-size: 22px;
+  font-weight: 600;
   color: var(--text);
+  line-height: 1.4;
 }
 
-#date {
+/* Breathing text */
+.breathing-text {
   font-size: 14px;
   color: var(--text-dim);
   font-weight: 400;
-  letter-spacing: 0.2px;
+  line-height: 1.5;
+  animation: breathe 8s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* --- Generic hidden --- */
+.hidden {
+  display: none !important;
+}
+
+/* --- Focus card --- */
+.focus-card {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 28px 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-md);
+  animation: cardIn 0.35s ease;
+  border: 1px solid rgba(0,0,0,0.03);
+}
+
+.focus-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 16px;
+}
+
+.focus-task-text {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.focus-step {
+  font-size: 15px;
+  color: var(--primary);
+  padding: 10px 14px;
+  background: var(--primary-light);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+
+.focus-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.focus-btn {
+  flex: 1;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  border: none;
+}
+
+.focus-btn:active {
+  transform: scale(0.97);
+}
+
+.focus-btn.primary {
+  background: var(--primary);
+  color: white;
+}
+
+.focus-btn.primary:hover {
+  background: var(--primary-dim);
+}
+
+.focus-btn.secondary {
+  background: var(--surface-hover);
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border);
+}
+
+.focus-btn.secondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.focus-skip {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 12px 0 0;
+  font-family: inherit;
+  transition: color 0.15s;
+}
+
+.focus-skip:hover {
+  color: var(--text-secondary);
+}
+
+/* Done state */
+.done-state {
+  text-align: center;
+  padding: 48px 20px;
+  animation: cardIn 0.4s ease;
+}
+
+
+.done-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.done-text {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.done-sub {
+  font-size: 15px;
+  color: var(--text-dim);
+}
+
+/* View toggle */
+.view-toggle {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+
+.toggle-btn {
+  background: none;
+  border: 1.5px solid var(--border);
+  color: var(--text-dim);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.toggle-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 /* --- Progress Ring --- */
@@ -471,6 +640,31 @@ li:hover .task-actions {
   background: rgba(196, 55, 44, 0.06);
 }
 
+/* --- More button & expandable actions --- */
+.more-btn {
+  padding: 5px 8px;
+  letter-spacing: 1px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.more-actions {
+  display: none;
+  gap: 4px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+li.show-more .more-actions {
+  display: flex;
+}
+
+/* When show-more is active, make actions wrap */
+li.show-more .task-actions {
+  flex-wrap: wrap;
+}
+
 /* --- Empty state --- */
 #empty-state {
   text-align: center;
@@ -481,14 +675,7 @@ li:hover .task-actions {
   line-height: 1.6;
 }
 
-#empty-state.hidden {
-  display: none;
-}
 
-#today-section.hidden,
-#pool-section.hidden {
-  display: none;
-}
 
 /* --- Overlay (shared) --- */
 .overlay {
@@ -505,9 +692,6 @@ li:hover .task-actions {
   -webkit-backdrop-filter: blur(4px);
 }
 
-.overlay.hidden {
-  display: none;
-}
 
 @keyframes overlayIn {
   from { opacity: 0; }
@@ -904,9 +1088,6 @@ li:hover .task-actions {
   white-space: nowrap;
 }
 
-.toast.hidden {
-  display: none;
-}
 
 @keyframes toastIn {
   from {
@@ -941,9 +1122,6 @@ li:hover .task-actions {
   z-index: 100;
 }
 
-.confetti.hidden {
-  display: none;
-}
 
 /* --- Responsive --- */
 @media (min-width: 600px) {

@@ -14,37 +14,68 @@
 </head>
 <body>
   <div id="app">
+    <!-- Greeting & breathing space -->
     <header>
       <div class="header-left">
-        <h1>此刻</h1>
-        <span id="date"></span>
+        <h1 id="greeting"></h1>
+        <p id="breathing-text" class="breathing-text"></p>
       </div>
-      <button id="help-btn" class="help-btn" title="使用说明" aria-label="使用说明">?</button>
-      <div id="progress-ring" class="progress-ring" title="今日进度">
-        <svg viewBox="0 0 40 40">
-          <circle class="ring-bg" cx="20" cy="20" r="16" />
-          <circle id="ring-fill" class="ring-fill" cx="20" cy="20" r="16" />
-        </svg>
-        <span id="progress-text" class="progress-text">0/3</span>
+      <div class="header-right">
+        <button id="help-btn" class="help-btn" title="使用说明" aria-label="使用说明">?</button>
+        <div id="progress-ring" class="progress-ring" title="今日进度">
+          <svg viewBox="0 0 40 40">
+            <circle class="ring-bg" cx="20" cy="20" r="16" />
+            <circle id="ring-fill" class="ring-fill" cx="20" cy="20" r="16" />
+          </svg>
+          <span id="progress-text" class="progress-text">0/3</span>
+        </div>
       </div>
     </header>
 
+    <!-- Focus card: one task at a time -->
+    <div id="focus-card" class="focus-card hidden">
+      <div class="focus-label">此刻，只看这一件</div>
+      <div id="focus-task-text" class="focus-task-text"></div>
+      <div id="focus-step" class="focus-step hidden"></div>
+      <div class="focus-actions">
+        <button id="focus-start" class="focus-btn primary">开始</button>
+        <button id="focus-break" class="focus-btn secondary">拆一步</button>
+      </div>
+      <button id="focus-skip" class="focus-skip">跳过，看下一件</button>
+    </div>
+
+    <!-- All done state -->
+    <div id="done-state" class="done-state hidden">
+      <div class="done-icon">🌟</div>
+      <p class="done-text" id="done-text">今天的任务都完成了</p>
+      <p class="done-sub">你做得很好。</p>
+    </div>
+
+    <!-- List view (toggled) -->
+    <div id="list-view" class="hidden">
+      <section id="today-section" class="hidden">
+        <h2>今日重点</h2>
+        <ul id="today-list"></ul>
+      </section>
+
+      <section id="pool-section" class="hidden">
+        <h2>待办池</h2>
+        <ul id="pool-list"></ul>
+      </section>
+    </div>
+
+    <!-- View toggle -->
+    <div id="view-toggle" class="view-toggle hidden">
+      <button id="toggle-view" class="toggle-btn"></button>
+    </div>
+
+    <!-- Input area -->
     <div id="input-area">
-      <input type="text" id="task-input" placeholder="写下你想做的事…" autocomplete="off" autofocus>
+      <input type="text" id="task-input" placeholder="写下你想做的事…" autocomplete="off">
       <button id="add-btn" class="add-btn" aria-label="添加任务">+</button>
     </div>
 
-    <section id="today-section">
-      <h2>今日重点</h2>
-      <ul id="today-list"></ul>
-    </section>
-
-    <section id="pool-section">
-      <h2>待办池</h2>
-      <ul id="pool-list"></ul>
-    </section>
-
-    <div id="empty-state">还没有任务，开始记录吧</div>
+    <div id="empty-state" class="hidden">还没有任务，写下一件你想做的事吧</div>
 
     <!-- Emotion buffer modal -->
     <div id="mood-overlay" class="overlay hidden">
@@ -107,8 +138,12 @@
           <div class="help-section">
             <h3>基本用法</h3>
             <div class="help-item">
-              <span class="help-label">输入框</span>
-              <span class="help-desc">输入你想做的事，按回车添加到待办池</span>
+              <span class="help-label">添加任务</span>
+              <span class="help-desc">在底部输入框写下想做的事，点 + 或按回车添加</span>
+            </div>
+            <div class="help-item">
+              <span class="help-label">聚焦模式</span>
+              <span class="help-desc">默认一次只显示一件事，减少焦虑。点底部按钮可切换列表视图</span>
             </div>
             <div class="help-item">
               <span class="help-label">双击任务文字</span>
@@ -132,7 +167,7 @@
             </div>
             <div class="help-item">
               <span class="help-badge break-btn">拆一步</span>
-              <span class="help-desc">任务太大不想做？拆成 5 分钟能完成的一小步，只看这一步</span>
+              <span class="help-desc">任务太大不想做？拆成 5 分钟能完成的一小步</span>
             </div>
             <div class="help-item">
               <span class="help-badge demote-btn">移回待办</span>
@@ -148,11 +183,7 @@
             <h3>特别功能</h3>
             <div class="help-item">
               <span class="help-label">情绪缓冲</span>
-              <span class="help-desc">点击今天的任务时，会先问你「现在感觉怎么样」。没准备好也没关系，可以等一等或者把任务拆小</span>
-            </div>
-            <div class="help-item">
-              <span class="help-label">任务拆解</span>
-              <span class="help-desc">害怕一个大任务？拆成 5 分钟能完成的第一步，只看这一步就好</span>
+              <span class="help-desc">在列表视图点击今天的任务时，会先问你感觉怎么样。没准备好也没关系</span>
             </div>
             <div class="help-item">
               <span class="help-label">进度圆环</span>
