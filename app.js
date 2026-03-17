@@ -786,9 +786,9 @@
     const makeId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     data.todayDate = key;
     data.tasks = [
-      { id: makeId(), text: '这是你的第一个任务，点「开始」试试', isToday: true, done: false, started: false, firstStep: null, created: new Date().toISOString(), doneDate: null },
-      { id: makeId(), text: '试试「拆一步」，把大任务变小', isToday: true, done: false, started: false, firstStep: null, created: new Date().toISOString(), doneDate: null },
-      { id: makeId(), text: '写下你今天真正想做的一件事', isToday: false, done: false, started: false, firstStep: null, created: new Date().toISOString(), doneDate: null },
+      { id: makeId(), text: '深呼吸三次，然后点「完成」', isToday: true, done: false, started: false, firstStep: null, created: new Date().toISOString(), doneDate: null },
+      { id: makeId(), text: '整理一下你眼前的桌面', isToday: true, done: false, started: false, firstStep: '先把离你最近的一样东西放回原位', created: new Date().toISOString(), doneDate: null },
+      { id: makeId(), text: '写下一件你一直想做却还没开始的事', isToday: false, done: false, started: false, firstStep: null, created: new Date().toISOString(), doneDate: null },
     ];
     save(data);
     render();
