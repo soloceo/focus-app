@@ -272,6 +272,18 @@
         };
         actions.appendChild(completeBtn);
       }
+
+      // Feature 1: Break down button (only if no first step yet)
+      if (!task.firstStep) {
+        const breakBtn = document.createElement('button');
+        breakBtn.className = 'status-btn break-btn';
+        breakBtn.textContent = '拆一步';
+        breakBtn.onclick = e => {
+          e.stopPropagation();
+          showFirstStepInput(task.id);
+        };
+        actions.appendChild(breakBtn);
+      }
     }
 
     if (!isToday && !task.done) {
@@ -605,6 +617,13 @@
 
   inputEl.addEventListener('compositionend', () => {
     // Let the value update first
+  });
+
+  // Add button
+  document.getElementById('add-btn').addEventListener('click', () => {
+    addTask(inputEl.value);
+    inputEl.value = '';
+    inputEl.focus();
   });
 
   // --- Notifications ---

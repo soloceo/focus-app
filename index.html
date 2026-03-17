@@ -30,7 +30,8 @@
     </header>
 
     <div id="input-area">
-      <input type="text" id="task-input" placeholder="记录一件事，按回车添加…" autocomplete="off" autofocus>
+      <input type="text" id="task-input" placeholder="写下你想做的事…" autocomplete="off" autofocus>
+      <button id="add-btn" class="add-btn" aria-label="添加任务">+</button>
     </div>
 
     <section id="today-section">
@@ -128,6 +129,10 @@
             <div class="help-item">
               <span class="help-badge complete-btn">完成</span>
               <span class="help-desc">做完了，标记为已完成</span>
+            </div>
+            <div class="help-item">
+              <span class="help-badge break-btn">拆一步</span>
+              <span class="help-desc">任务太大不想做？拆成 5 分钟能完成的一小步，只看这一步</span>
             </div>
             <div class="help-item">
               <span class="help-badge demote-btn">移回待办</span>
