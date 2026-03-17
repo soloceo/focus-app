@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="专注">
+  <meta name="apple-mobile-web-app-title" content="此刻">
   <meta name="theme-color" content="#F9F5EE">
-  <title>专注</title>
+  <title>此刻</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="stylesheet" href="style.css">
@@ -16,7 +16,7 @@
   <div id="app">
     <header>
       <div class="header-left">
-        <h1>专注</h1>
+        <h1>此刻</h1>
         <span id="date"></span>
       </div>
       <div id="progress-ring" class="progress-ring" title="今日进度">
@@ -86,6 +86,41 @@
         <p class="encourage-text" id="encourage-text"></p>
         <p class="encourage-hint">5 分钟后再来看看</p>
         <button id="encourage-close" class="firststep-btn primary">好的</button>
+      </div>
+    </div>
+
+    <!-- Onboarding overlay -->
+    <div id="onboarding-overlay" class="overlay hidden">
+      <div class="onboarding-card">
+        <div class="onboarding-pages">
+          <div class="onboarding-page active" data-page="0">
+            <div class="onboarding-icon">🌅</div>
+            <h2 class="onboarding-title">你好，欢迎来到此刻</h2>
+            <p class="onboarding-text">不用想太远的事。<br>此刻，只关注眼前最重要的一小步。</p>
+          </div>
+          <div class="onboarding-page" data-page="1">
+            <div class="onboarding-icon">✨</div>
+            <h2 class="onboarding-title">每天只做三件事</h2>
+            <p class="onboarding-text">写下你想做的事，选出今天最重要的三件。<br>不多，三件就够了。</p>
+          </div>
+          <div class="onboarding-page" data-page="2">
+            <div class="onboarding-icon">🌿</div>
+            <h2 class="onboarding-title">害怕开始？没关系</h2>
+            <p class="onboarding-text">点开任务时，我会先问你感觉怎么样。<br>不想做可以拆小一点，或者等一等。<br>点了「开始」就是最大的进步。</p>
+          </div>
+          <div class="onboarding-page" data-page="3">
+            <div class="onboarding-icon">🌱</div>
+            <h2 class="onboarding-title">准备好了吗？</h2>
+            <p class="onboarding-text">慢慢来，不急。<br>从此刻开始，一小步一小步地走。</p>
+          </div>
+        </div>
+        <div class="onboarding-dots">
+          <span class="dot active"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+        <button id="onboarding-next" class="firststep-btn primary onboarding-btn">下一步</button>
       </div>
     </div>
 
