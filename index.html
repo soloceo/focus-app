@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="专注">
+  <meta name="theme-color" content="#1a2744">
+  <title>专注</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>专注</h1>
+      <span id="date"></span>
+    </header>
+
+    <div id="input-area">
+      <input type="text" id="task-input" placeholder="记录一件事，按回车添加…" autocomplete="off" autofocus>
+    </div>
+
+    <section id="today-section">
+      <h2>今日重点 <span id="today-count">0</span>/3</h2>
+      <ul id="today-list"></ul>
+    </section>
+
+    <section id="pool-section">
+      <h2>待办池</h2>
+      <ul id="pool-list"></ul>
+    </section>
+
+    <div id="empty-state">还没有任务，开始记录吧</div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
