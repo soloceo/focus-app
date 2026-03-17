@@ -368,45 +368,14 @@ li:hover .task-actions {
   opacity: 1;
 }
 
-.action-btn {
-  background: none;
-  border: none;
-  color: var(--text-dim);
-  font-size: 17px;
-  cursor: pointer;
-  padding: 4px 7px;
-  border-radius: 8px;
-  transition: color 0.15s, background 0.15s;
-  line-height: 1;
-}
-
-.action-btn:hover {
-  background: var(--surface-hover);
-  color: var(--text-secondary);
-}
-
-.action-btn.promote {
-  color: var(--primary);
-}
-
-.action-btn.promote:hover {
-  background: var(--primary-light);
-  color: var(--primary-dim);
-}
-
-.action-btn.delete:hover {
-  color: var(--danger);
-  background: rgba(196, 55, 44, 0.06);
-}
-
-/* Start/complete status buttons */
+/* --- Status buttons (all action buttons) --- */
 .status-btn {
   background: none;
   border: 1.5px solid var(--border);
   color: var(--text-dim);
   font-size: 13px;
   cursor: pointer;
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: 20px;
   transition: all 0.2s;
   line-height: 1.3;
@@ -417,6 +386,19 @@ li:hover .task-actions {
 .status-btn:hover {
   border-color: var(--primary);
   color: var(--primary);
+  background: var(--primary-light);
+}
+
+.status-btn:active {
+  transform: scale(0.95);
+}
+
+.status-btn.promote-btn {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.status-btn.promote-btn:hover {
   background: var(--primary-light);
 }
 
@@ -432,6 +414,20 @@ li:hover .task-actions {
 .status-btn.complete-btn {
   border-color: var(--primary);
   color: var(--primary);
+}
+
+.status-btn.demote-btn {
+  color: var(--text-dim);
+}
+
+.status-btn.delete-btn {
+  color: var(--text-dim);
+}
+
+.status-btn.delete-btn:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+  background: rgba(196, 55, 44, 0.06);
 }
 
 /* --- Empty state --- */
