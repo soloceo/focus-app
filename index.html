@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="专注">
-  <meta name="theme-color" content="#1a2744">
+  <meta name="theme-color" content="#F9F5EE">
   <title>专注</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -15,8 +15,17 @@
 <body>
   <div id="app">
     <header>
-      <h1>专注</h1>
-      <span id="date"></span>
+      <div class="header-left">
+        <h1>专注</h1>
+        <span id="date"></span>
+      </div>
+      <div id="progress-ring" class="progress-ring" title="今日进度">
+        <svg viewBox="0 0 40 40">
+          <circle class="ring-bg" cx="20" cy="20" r="16" />
+          <circle id="ring-fill" class="ring-fill" cx="20" cy="20" r="16" />
+        </svg>
+        <span id="progress-text" class="progress-text">0/3</span>
+      </div>
     </header>
 
     <div id="input-area">
@@ -24,7 +33,7 @@
     </div>
 
     <section id="today-section">
-      <h2>今日重点 <span id="today-count">0</span>/3</h2>
+      <h2>今日重点</h2>
       <ul id="today-list"></ul>
     </section>
 
@@ -34,6 +43,56 @@
     </section>
 
     <div id="empty-state">还没有任务，开始记录吧</div>
+
+    <!-- Emotion buffer modal -->
+    <div id="mood-overlay" class="overlay hidden">
+      <div class="mood-card">
+        <div class="mood-task-name" id="mood-task-name"></div>
+        <p class="mood-question">现在感觉怎么样？</p>
+        <div class="mood-options">
+          <button class="mood-btn mood-ready" data-mood="ready">
+            <span class="mood-icon">💪</span>
+            <span>准备好了</span>
+          </button>
+          <button class="mood-btn mood-not-ready" data-mood="not-ready">
+            <span class="mood-icon">🌿</span>
+            <span>还没准备好</span>
+          </button>
+          <button class="mood-btn mood-break-down" data-mood="break-down">
+            <span class="mood-icon">✂️</span>
+            <span>需要拆小一点</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- First step input modal -->
+    <div id="firststep-overlay" class="overlay hidden">
+      <div class="firststep-card">
+        <p class="firststep-question">第一步是什么？</p>
+        <p class="firststep-hint">只需要 5 分钟能做完的那一步</p>
+        <input type="text" id="firststep-input" placeholder="比如：打开文档，写下标题…" autocomplete="off">
+        <div class="firststep-actions">
+          <button id="firststep-cancel" class="firststep-btn secondary">取消</button>
+          <button id="firststep-confirm" class="firststep-btn primary">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Encouragement overlay -->
+    <div id="encourage-overlay" class="overlay hidden">
+      <div class="encourage-card">
+        <div class="encourage-icon">🌱</div>
+        <p class="encourage-text" id="encourage-text"></p>
+        <p class="encourage-hint">5 分钟后再来看看</p>
+        <button id="encourage-close" class="firststep-btn primary">好的</button>
+      </div>
+    </div>
+
+    <!-- Toast feedback -->
+    <div id="toast" class="toast hidden"></div>
+
+    <canvas id="confetti" class="confetti hidden"></canvas>
   </div>
 
   <script src="app.js"></script>

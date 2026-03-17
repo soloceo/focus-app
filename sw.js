@@ -1,4 +1,4 @@
-const CACHE_NAME = 'focus-v1';
+const CACHE_NAME = 'focus-v4';
 const ASSETS = [
   './',
   './index.html',
