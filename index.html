@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="此刻">
+  <meta name="theme-color" content="#F9F5EE">
+  <title>此刻</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="style.css?v=9">
+</head>
+<body>
+  <div id="app">
+    <!-- Greeting & breathing space -->
+    <header>
+      <div class="header-left">
+        <h1 id="greeting"></h1>
+        <div class="breathing-row">
+          <div class="breathing-circle"></div>
+          <p id="breathing-text" class="breathing-text"></p>
+        </div>
+      </div>
+      <div class="header-right">
+        <button id="settings-btn" class="settings-btn" title="设置" aria-label="设置">⚙</button>
+        <button id="help-btn" class="help-btn" title="使用说明" aria-label="使用说明">?</button>
+        <div id="progress-ring" class="progress-ring" title="今日进度">
+          <svg viewBox="0 0 40 40">
+            <circle class="ring-bg" cx="20" cy="20" r="16" />
+            <circle id="ring-fill" class="ring-fill" cx="20" cy="20" r="16" />
+          </svg>
+          <span id="progress-text" class="progress-text">0/3</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Focus card: one task at a time -->
+    <div id="focus-card" class="focus-card hidden">
+      <div class="focus-label">此刻，只看这一件</div>
+      <div id="focus-task-text" class="focus-task-text"></div>
+      <div id="focus-step" class="focus-step hidden"></div>
+      <div class="focus-actions">
+        <button id="focus-start" class="focus-btn primary">开始</button>
+        <button id="focus-break" class="focus-btn secondary">拆一步</button>
+      </div>
+      <button id="focus-skip" class="focus-skip">跳过，看下一件</button>
+    </div>
+
+    <!-- All done state -->
+    <div id="done-state" class="done-state hidden">
+      <div class="done-icon">🌟</div>
+      <p class="done-text" id="done-text">今天的任务都完成了</p>
+      <p class="done-sub">你做得很好。</p>
+    </div>
+
+    <!-- Pool hint: no today tasks but pool has items -->
+    <div id="pool-hint" class="pool-hint hidden">
+      <p class="pool-hint-text" id="pool-hint-text"></p>
+      <button id="pool-hint-btn" class="focus-btn secondary">去看看</button>
+    </div>
+
+    <!-- List view (toggled) -->
+    <div id="list-view" class="hidden">
+      <section id="today-section" class="hidden">
+        <h2>今日重点</h2>
+        <ul id="today-list"></ul>
+      </section>
+
+      <section id="pool-section" class="hidden">
+        <h2>待办池</h2>
+        <ul id="pool-list"></ul>
+      </section>
+    </div>
+
+    <!-- View toggle -->
+    <div id="view-toggle" class="view-toggle hidden">
+      <button id="toggle-view" class="toggle-btn"></button>
+    </div>
+
+    <!-- Input area -->
+    <div id="input-area">
+      <input type="text" id="task-input" placeholder="写下你想做的事…" autocomplete="off">
+      <button id="add-btn" class="add-btn" aria-label="添加任务">+</button>
+    </div>
+
+    <div id="empty-state" class="hidden">还没有任务，写下一件你想做的事吧</div>
+
+    <!-- Emotion buffer modal -->
+    <div id="mood-overlay" class="overlay hidden">
+      <div class="mood-card">
+        <div class="mood-task-name" id="mood-task-name"></div>
+        <p class="mood-question">现在感觉怎么样？</p>
+        <div class="mood-options">
+          <button class="mood-btn mood-ready" data-mood="ready">
+            <span class="mood-icon">💪</span>
+            <span>准备好了</span>
+          </button>
+          <button class="mood-btn mood-not-ready" data-mood="not-ready">
+            <span class="mood-icon">🌿</span>
+            <span>还没准备好</span>
+          </button>
+          <button class="mood-btn mood-break-down" data-mood="break-down">
+            <span class="mood-icon">✂️</span>
+            <span>需要拆小一点</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- First step input modal -->
+    <div id="firststep-overlay" class="overlay hidden">
+      <div class="firststep-card">
+        <p class="firststep-question">第一步是什么？</p>
+        <p class="firststep-hint">只需要 5 分钟能做完的那一步</p>
+        <input type="text" id="firststep-input" placeholder="比如：打开文档，写下标题…" autocomplete="off">
+        <button id="ai-suggest-btn" class="ai-suggest-btn">✨ 帮我想一步</button>
+        <div class="firststep-actions">
+          <button id="firststep-cancel" class="firststep-btn secondary">取消</button>
+          <button id="firststep-confirm" class="firststep-btn primary">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Encouragement overlay -->
+    <div id="encourage-overlay" class="overlay hidden">
+      <div class="encourage-card">
+        <div class="encourage-icon">🌱</div>
+        <p class="encourage-text" id="encourage-text"></p>
+        <p class="encourage-hint">5 分钟后再来看看</p>
+        <button id="encourage-close" class="firststep-btn primary">好的</button>
+      </div>
+    </div>
+
+    <!-- Help overlay -->
+    <div id="help-overlay" class="overlay hidden">
+      <div class="help-card">
+        <div class="help-header">
+          <h2 class="help-title">使用说明</h2>
+          <button id="help-close" class="help-close-btn" aria-label="关闭">&times;</button>
+        </div>
+        <div class="help-body">
+          <div class="help-intro">
+            <p>拖延不是懒，是因为任务看起来太大、太远、太难开始。</p>
+            <p><strong>此刻</strong>帮你把注意力收回眼前，只看一小步。</p>
+          </div>
+
+          <div class="help-section">
+            <h3>怎么用</h3>
+            <div class="help-item">
+              <span class="help-label">写下来</span>
+              <span class="help-desc">底部输入框，把脑子里的事写出来。写下来本身就是进步</span>
+            </div>
+            <div class="help-item">
+              <span class="help-label">选三件</span>
+              <span class="help-desc">每天最多选 3 件事「加入今天」。少即是多，不贪心</span>
+            </div>
+            <div class="help-item">
+              <span class="help-label">看一件</span>
+              <span class="help-desc">聚焦模式一次只看一件事，不被其他任务干扰</span>
+            </div>
+          </div>
+
+          <div class="help-section">
+            <h3>遇到困难时</h3>
+            <div class="help-item">
+              <span class="help-badge break-btn">拆一步</span>
+              <span class="help-desc">任务太大不想动？拆成 5 分钟能做完的一小步，小到不好意思不做</span>
+            </div>
+            <div class="help-item">
+              <span class="help-badge start-btn">开始</span>
+              <span class="help-desc">不用做完，先「开始」就好。开始是最难也最重要的一步</span>
+            </div>
+            <div class="help-item">
+              <span class="help-label">情绪缓冲</span>
+              <span class="help-desc">在列表视图点击任务时，会先问你感觉怎么样。没准备好也没关系，不急</span>
+            </div>
+          </div>
+
+          <div class="help-section">
+            <h3>背后的道理</h3>
+            <div class="help-item">
+              <span class="help-label">为什么只有 3 件</span>
+              <span class="help-desc">选择越多越焦虑。只挑 3 件，让大脑觉得「我能做到」</span>
+            </div>
+            <div class="help-item">
+              <span class="help-label">5 分钟法则</span>
+              <span class="help-desc">大脑一旦开始就想完成。难的从来不是做完，而是开始</span>
+            </div>
+            <div class="help-item">
+              <span class="help-label">完成 ≠ 完美</span>
+              <span class="help-desc">做了 60 分的事，比想了 100 分却没动手强太多了</span>
+            </div>
+            <div class="help-item">
+              <span class="help-label">跳过也没关系</span>
+              <span class="help-desc">跳过不是放弃，是在找此刻最想做的那一件</span>
+            </div>
+            <div class="help-item">
+              <span class="help-label">为什么问你感觉</span>
+              <span class="help-desc">承认「还没准备好」本身就是进步。不强迫，反而更容易开始</span>
+            </div>
+          </div>
+
+          <div class="help-section">
+            <h3>小贴士</h3>
+            <div class="help-item">
+              <span class="help-label">双击文字</span>
+              <span class="help-desc">可以修改任务内容</span>
+            </div>
+            <div class="help-item">
+              <span class="help-label">进度圆环</span>
+              <span class="help-desc">右上角显示今天的进度，全部完成有小惊喜</span>
+            </div>
+            <div class="help-item">
+              <span class="help-label">查看全部</span>
+              <span class="help-desc">点底部按钮切换聚焦模式和列表视图</span>
+            </div>
+          </div>
+
+          <div class="help-footer">
+            <p>完成一件小事，比计划十件大事更有力量。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings overlay -->
+    <div id="settings-overlay" class="overlay hidden">
+      <div class="settings-card">
+        <div class="help-header">
+          <h2 class="help-title">设置</h2>
+          <button id="settings-close" class="help-close-btn" aria-label="关闭">&times;</button>
+        </div>
+        <div class="settings-body">
+          <div class="settings-section">
+            <h3>AI 智能拆步</h3>
+            <p class="settings-desc">配置 API Key 后，「拆一步」时可以让 AI 帮你想出第一步。</p>
+            <p class="settings-desc settings-privacy">Key 仅存储在你的设备上，不会发送到其他地方。</p>
+            <div class="settings-provider">
+              <button class="provider-btn active" data-provider="gemini">Gemini</button>
+              <button class="provider-btn" data-provider="openai">OpenAI</button>
+              <button class="provider-btn" data-provider="claude">Claude</button>
+            </div>
+            <a id="api-key-link" class="api-key-link" href="" target="_blank" rel="noopener">获取 API Key</a>
+            <div class="settings-key-row">
+              <input type="password" id="api-key-input" placeholder="" autocomplete="off">
+              <button id="api-key-save" class="firststep-btn primary">保存</button>
+            </div>
+            <div class="api-key-status-row">
+              <div id="api-key-status" class="api-key-status"></div>
+              <button id="api-key-clear" class="api-key-clear hidden">清除</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekly review overlay -->
+    <div id="review-overlay" class="overlay hidden">
+      <div class="review-card">
+        <div class="review-icon">🌿</div>
+        <p class="review-title" id="review-title"></p>
+        <p class="review-detail" id="review-detail"></p>
+        <button id="review-close" class="firststep-btn primary">继续加油</button>
+      </div>
+    </div>
+
+    <!-- Toast feedback -->
+    <div id="toast" class="toast hidden"></div>
+
+    <canvas id="confetti" class="confetti hidden"></canvas>
+  </div>
+
+  <script src="app.js?v=9"></script>
+</body>
+</html>
